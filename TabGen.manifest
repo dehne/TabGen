@@ -1,0 +1,13 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"id":	"03eb8013-e029-4d3e-96bb-4ae9c4b0bbde",
+	"author":	"D. L. Ehnebuske",
+	"description":	{
+		"":	"Fusion 360 add-in to generate finger-joint tabs along a rectangular edge"
+	},
+	"version":	"0.01",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}

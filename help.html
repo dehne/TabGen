@@ -1,0 +1,95 @@
+<html>
+  <!--
+  Copyright (C) 2018 by D. L. Ehnebuske
+ 
+  This file is part of TabGen.
+ 
+  TabGen is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+ 
+  TabGen is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with TabGen. If not, see <https://www.gnu.org/licenses/>.
+  -->
+  <body>
+	<h1>Help for the TabGen Fusion 360 Add-In</h1>
+	
+	<h2>What is TabGen?</h2>
+    <p>In designs intended to have their parts laser cut from sheet material,
+	it&rsquo;s common to use &ldquo;finger-joints&rdquo; to connect parts to one another. 
+	It&rsquo;s not hard to add the cuts for finger-joints to the edges of parts in Fusion 360, 
+	but it <i>is</i> tedious. After doing so a bunch of times, I decided to write this add-in 
+	&ndash; TabGen &ndash; to automate the process. TabGen is free software distributed under 
+	GNU General Public License version 3 or later. See <a href="./readme.html">readme.html</a> 
+	for details and for installation instructions.</p>
+	
+	<p>This is the first version of TabGen. Though I think I&rsquo;ve tested it pretty well, 
+	I'm sure 1there are bugs in it. Feedback on any problems you encounter would be most 
+	welcome. Similarly, there are no doubt improvements that could be made. Let me know what 
+	you&rsquo;d like to see added or changed.</p>
+
+	<p>Speaking of changes, the one I&rsquo;d most like is to have TabGen work smoothly with fully
+	parameterized designs. That is, to have already-cut joints automatically adjust as necessary 
+	when user parameters are changed. So far, I haven't quite gotten there. At the end of this 
+	write-up I&rsquo;ve included some technical details of the stumbling block I&rsquo;ve 
+	encountered	in the hope an expert in the API might help put me on the right track.</p>
+
+	<h2>Using TabGen</h2>
+	<p>To use TabGen, select it from the Modify menu.</p>
+
+	<img src="./ss1.png">
+
+	<p>This brings up the TabGen dialog used to specify where the finger joints should be made, how 
+	big the tabs and gaps should be, the thickness of the material to be cut, and whether the
+	finger-joints along the selected face(s) should start with a tab or a gap.</p>
+
+	<img src="./ss2.png">
+
+	<p>Next, select the faces on which the tabs and gaps are to be cut. You can select any number 
+	of faces to be cut in a single pass.</p>
+
+	<img src="ss3.png">
+
+	<p>With the faces selected and the other parameters adjusted to your needs, click on the 
+	&ldquo;Ok&rdquo; button. This causes TabGen to cut tabs in all of the selected faces.</p>
+
+	<img src="ss4.png">
+
+	<p>TabGen will only cut tabs and gaps on rectangular faces with one dimension equal to the 
+	specified material thickness and a length that&rsquo;s at least long enough to cut one 
+	complete finger-joint. If you select a face that can&rsquo;t be cut, an error message will 
+	display in the dialog box explaining what&rsquo;s wrong, and you won&rsquo;t be able to 
+	click the &ldquo;Ok&rdquo; button.</p>
+
+	<h2>On supporting parameterized models</h2>
+	<p>As I mentioned above, I&rsquo;d like to support parameterized models in TabGen, but I 
+	haven&rsquo;t figured out how to do it.</p>
+	
+	<p>The fundamental problem I&rsquo;ve encountered is that in a parameterized model, the 
+	dimensions of a face into which finger-joint cuts are to be made depend on some unknown 
+	function of some unknown set of user-defined parameters. Since the location, number of 
+	cuts and cut depth can all change when the face dimensions change, I need to specify all 
+	of that using expression properties in things like ModelParameter objects associated with OffsetConstraint objects. That would be possible if I could refer to other ModelParameter 
+	objects in expressions, but that doesn&rsquo;t seem to work.</p>
+	
+	<p>For example, the number of gaps to be cut along a face is floor(faceLength / (2 * tabWidth)). 
+	I need that number to create a rectangular pattern with the correct number of cuts. But 
+	faceLength is some unknown function of some unknown user parameters, so how do I specify it 
+	in an expression? I got pretty close but not all the way there.</p>
+	
+	<p>I can create a driven SketchDimension object on the face that's equal to faceLength. That 
+	SketchDimension has a ModelParameter associated with it and that ModelParameter has a value 
+	property with the correct contents and its contents are appropriately updated as user 
+	parameters are adjusted. But using the name of a ModelParameter in an expression (as you would 
+	the name of a UserParameter) generates an error. Sigh.</p>
+	
+	<p>I&rsquo;m pretty much out of ideas, and a question I posted on the Fusion 360 API forum has gotten 
+	no responses. Any help would be much appreciated.</p>
+  </body>
+</html>
